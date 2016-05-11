@@ -64,7 +64,6 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        reset();
         lastTime = Date.now();
         main();
     }
@@ -95,6 +94,7 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+        token.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -135,8 +135,10 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
             }
         }
-
         renderEntities();
+        addPoints();
+        addLives();
+        reset();
     }
 
     /* This function is called by the render function and is called on each game
@@ -152,6 +154,21 @@ var Engine = (function(global) {
         });
 
        player.render(); 
+       token.render();
+    }
+
+    function addPoints() {
+        ctx.clearRect(250, 0, 260, 50);
+        ctx.fillStyle = "black";
+        ctx.font = "22px Arial";
+        ctx.fillText(("Score: " + player.points), 380, 45);
+    }
+
+    function addLives() {
+        ctx.clearRect(0, 0, 250, 50);
+        ctx.fillStyle = "black";
+        ctx.font = "22px Arial";
+        ctx.fillText(("Lives: " + player.lives), 25, 45);
     }
 
     /* This function does nothing but it could have been a good place to
@@ -159,7 +176,21 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        if (player.lives === 0) {
+            var grd = ctx.createLinearGradient(0, 0, 500, 606);
+            grd.addColorStop(0, "#b3b3ff");
+            grd.addColorStop(1, "#b3e6cc");
+            ctx.fillStyle = grd;
+            ctx.globalAlpha = 0.8;
+            ctx.fillRect(0, 0, 505, 606);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "navy";
+            ctx.font = "30px Arial";
+            ctx.fillText("GAME OVER", 160, 250);
+            ctx.font = "24px Arial";
+            ctx.fillText(("Final Score: " + player.points), 165, 300);
+            ctx.fillText(("'n' for new game"), 165, 350);
+        }
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -174,7 +205,11 @@ var Engine = (function(global) {
         'images/char-cat-girl.png',
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
-        'images/char-princess-girl.png'
+        'images/char-princess-girl.png',
+        'images/Heart.png',
+        'images/Gem-Blue.png',
+        'images/Gem-Green.png',
+        'images/Gem-Orange.png'
     ]);
     Resources.onReady(init);
 

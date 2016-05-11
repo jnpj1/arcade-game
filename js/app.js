@@ -17,9 +17,9 @@ Enemy.prototype.giveProperties = function () {
     var giveNewSpeed = function() {
         var speedAssigner = Math.random();
         var newSpeed = 0;
-        if (speedAssigner < 0.34) {
+        if (speedAssigner < 0.21) {
             newSpeed = 100;
-        } else if (speedAssigner < 0.67) {
+        } else if (speedAssigner < 0.51) {
             newSpeed = 200;
         } else {
             newSpeed = 300;
@@ -27,6 +27,7 @@ Enemy.prototype.giveProperties = function () {
         return newSpeed;
     };
     this.speed = giveNewSpeed();
+
     var giveNewPosition = function() {
         var positionAssigner = Math.random();
         var newPosition = 0;
@@ -59,7 +60,10 @@ Enemy.prototype.update = function(dt) {
     if ((xCollisionDetection < 50) && (yCollisionDetection < 21)) {
         player.x = 200;
         player.y = 400;
+        token.x = -100;
+        token.y = -100;
         player.collisionCounter += 1;
+        player.lives -= 1;
         if (player.collisionCounter === 1) {
             player.sprite = 'images/char-horn-girl.png';
         } else if (player.collisionCounter === 2) {
@@ -88,6 +92,8 @@ var Player = function() {
     this.y = 400;
     this.collisionCounter = 0;
     this.visualDelayCounter = 0;
+    this.points = 0;
+    this.lives = 5;
 };
 
 /*Player.prototype.update = function() {
@@ -105,6 +111,8 @@ Player.prototype.update = function() {
     if ((this.y === 0) && (this.visualDelayCounter === 20)) {
         backToGrass = 400;
         this.visualDelayCounter = 0;
+        this.points += 10;
+        token.giveProperties();
     }
     this.y += backToGrass;
 };
@@ -129,8 +137,73 @@ Player.prototype.handleInput = function(key) {
     this.y += yMovement;
 };
 
+var SpecialToken = function() {
+    this.sprite = "images/Heart.png";
+    this.x = -100;
+    this.y = -100;
+    this.pointValue = 0;
+    this.lifeValue = 0;
+}
 
+SpecialToken.prototype.giveProperties = function() {
+    var tokenSelector = Math.random();
+    var xCoordinate = Math.random();
+    var yCoordinate = Math.random();
+    if (tokenSelector < 0.16) {
+        this.sprite = "images/Heart.png";
+        this.lifeValue = 1;
+        this.pointValue = 0;
+    } else if (tokenSelector < 0.26) {
+        this.sprite = "images/Gem-Blue.png";
+        this.lifeValue = 0;
+        this.pointValue = 40;
+    } else if (tokenSelector < 0.51) {
+        this.sprite = "images/Gem-Green.png";
+        this.lifeValue = 0;
+        this.pointValue = 30;
+    } else {
+        this.sprite = "images/Gem-Orange.png";
+        this.lifeValue = 0;
+        this.pointValue = 20;
+    }
+    console.log(this.sprite);
 
+    if (xCoordinate < 0.21) {
+        this.x = 0;
+    } else if (xCoordinate < 0.41) {
+        this.x = 100;
+    } else if (xCoordinate < 0.61) {
+        this.x = 200;
+    } else if (xCoordinate < 0.81) {
+        this.x = 300;
+    } else {
+        this.x = 400;
+    }
+
+    if (yCoordinate < 0.34) {
+        this.y = 80;
+    } else if (yCoordinate < 0.67) {
+        this.y = 160;
+    } else {
+        this.y = 240;
+    }
+    console.log(this.x + " " + this.y);
+};
+
+SpecialToken.prototype.update = function() {
+    var xCollisionDetection = Math.abs(this.x - player.x);
+    var yCollisionDetection = Math.abs(this.y - player.y);
+    if ((xCollisionDetection < 50) && (yCollisionDetection < 21)) {
+        this.x = -100;
+        this.y = -100;
+        player.lives += this.lifeValue;
+        player.points += this.pointValue;
+    }
+}
+
+SpecialToken.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
@@ -141,12 +214,20 @@ var enemy2 = new Enemy();
 enemy2.giveProperties();
 var enemy3 = new Enemy();
 enemy3.giveProperties();
+var enemy4 = new Enemy();
+enemy4.giveProperties();
+var enemy5 = new Enemy();
+enemy5.giveProperties();
+
+
 
 var allEnemies = [];
 
-allEnemies.push(enemy1, enemy2, enemy3);
+allEnemies.push(enemy1, enemy2, enemy3, enemy4, enemy5);
 
 var player = new Player(); 
+
+var token = new SpecialToken();
 
 
 
@@ -159,5 +240,14 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-    player.handleInput(allowedKeys[e.keyCode]);
+    if (player.lives > 0) {
+        player.handleInput(allowedKeys[e.keyCode]);
+    }
+});
+
+document.addEventListener('keydown', function(n) {
+    if ((player.lives === 0) && (n.keyCode === 78)) {
+        player.lives = 5;
+        player.points = 0;
+    }
 });
