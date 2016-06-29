@@ -38,7 +38,7 @@ Enemy.prototype.giveProperties = function () {
         } else {
             newPosition = 230;
         }
-        return newPosition;   
+        return newPosition;
     };
     this.y = giveNewPosition();
 };
@@ -225,7 +225,7 @@ var allEnemies = [];
 
 allEnemies.push(enemy1, enemy2, enemy3, enemy4, enemy5);
 
-var player = new Player(); 
+var player = new Player();
 
 var token = new SpecialToken();
 
