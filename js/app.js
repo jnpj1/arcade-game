@@ -1,18 +1,13 @@
-// Enemies our player must avoid
+// Enemy class definition.
+// Assigns off-screen position and speed of 0.
 var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
     this.x = -100;
     this.y = 0;
     this.speed = 0;
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
+// Assigns randomly the enemy's speed and y position.
 Enemy.prototype.giveProperties = function () {
     var giveNewSpeed = function() {
         var speedAssigner = Math.random();
@@ -43,10 +38,13 @@ Enemy.prototype.giveProperties = function () {
     this.y = giveNewPosition();
 };
 
+// Updates enemy's position and detects collisions
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
+    // Updates enemy's x position to produce movement effect.
+    // Returns enemy's x position to starting point after canvas
+    // has been fully traversed.
+    // Movement is multiplied by the dt parameter to ensure
+    // the game runs at the same speed for all computers.
     if (this.x < 600) {
         this.x += dt * this.speed;
     }
@@ -55,6 +53,10 @@ Enemy.prototype.update = function(dt) {
         this.giveProperties();
     }
 
+    // Collision detection mechanism to determine if the x,y
+    // coordinates of the player and enemy are close enough
+    // to warrant collision effect.
+    // Collisions remove a life from the player.
     var xCollisionDetection = Math.abs(this.x - player.x);
     var yCollisionDetection = Math.abs(this.y - player.y);
     if ((xCollisionDetection < 50) && (yCollisionDetection < 21)) {
@@ -62,8 +64,11 @@ Enemy.prototype.update = function(dt) {
         player.y = 400;
         token.x = -100;
         token.y = -100;
-        player.collisionCounter += 1;
         player.lives -= 1;
+
+        // Switches between player sprites upon collision
+        // to produce team effect.
+        player.collisionCounter += 1;
         if (player.collisionCounter === 1) {
             player.sprite = 'images/char-horn-girl.png';
         } else if (player.collisionCounter === 2) {
@@ -77,15 +82,13 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
-// Draw the enemy on the screen, required method for game
+// Draws the enemy on the screen
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-
+// Player class definition.
+// Assigns initial position, sprite image, points, and lives.
 var Player = function() {
     this.sprite = 'images/char-cat-girl.png';
     this.x = 200;
@@ -96,14 +99,12 @@ var Player = function() {
     this.lives = 5;
 };
 
-/*Player.prototype.update = function() {
- Add functionality to return player to grass when water is reached.
- Add collision functionality, if needed here also.
-};*/
-
+// Updates player position. Returns player to grass and generates token
+// when water is reached.
 Player.prototype.update = function() {
     var backToGrass = 0;
     if (this.y === 0) {
+        // Produces a visual delay in the player returning to the grass
         if (this.visualDelayCounter < 20) {
             this.visualDelayCounter++;
         }
@@ -117,56 +118,64 @@ Player.prototype.update = function() {
     this.y += backToGrass;
 };
 
+
+// Draws the player on the screen
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+// Processes key input and updates player's x/y coorindates
 Player.prototype.handleInput = function(key) {
     var xMovement = 0;
     var yMovement = 0;
-    if ((key === "up") && (this.y > 0)) {
+    if ((key === 'up') && (this.y > 0)) {
         yMovement = -80;
-    } else if ((key === "down") && (this.y < 400)) {
+    } else if ((key === 'down') && (this.y < 400)) {
         yMovement = 80;
-    } else if ((key === "right") && (this.x < 400)) {
+    } else if ((key === 'right') && (this.x < 400)) {
         xMovement = 100;
-    } else if ((key === "left") && (this.x > 0)) {
+    } else if ((key === 'left') && (this.x > 0)) {
         xMovement = -100;
     }
     this.x += xMovement;
     this.y += yMovement;
 };
 
+// Special token class definition.
+// Sets initial position to be off-screen with no
+// point or life value.
 var SpecialToken = function() {
-    this.sprite = "images/Heart.png";
+    this.sprite = 'images/Heart.png';
     this.x = -100;
     this.y = -100;
     this.pointValue = 0;
     this.lifeValue = 0;
-}
+};
 
+// Assigns randomly the special token's sprite and position.
+// Different sprites will update token with corresponding
+// point/life values.
 SpecialToken.prototype.giveProperties = function() {
     var tokenSelector = Math.random();
     var xCoordinate = Math.random();
     var yCoordinate = Math.random();
     if (tokenSelector < 0.16) {
-        this.sprite = "images/Heart.png";
+        this.sprite = 'images/Heart.png';
         this.lifeValue = 1;
         this.pointValue = 0;
     } else if (tokenSelector < 0.26) {
-        this.sprite = "images/Gem-Blue.png";
+        this.sprite = 'images/Gem-Blue.png';
         this.lifeValue = 0;
         this.pointValue = 40;
     } else if (tokenSelector < 0.51) {
-        this.sprite = "images/Gem-Green.png";
+        this.sprite = 'images/Gem-Green.png';
         this.lifeValue = 0;
         this.pointValue = 30;
     } else {
-        this.sprite = "images/Gem-Orange.png";
+        this.sprite = 'images/Gem-Orange.png';
         this.lifeValue = 0;
         this.pointValue = 20;
     }
-    console.log(this.sprite);
 
     if (xCoordinate < 0.21) {
         this.x = 0;
@@ -187,9 +196,11 @@ SpecialToken.prototype.giveProperties = function() {
     } else {
         this.y = 240;
     }
-    console.log(this.x + " " + this.y);
 };
 
+// Collision detection mechanism for player and token.
+// Updates player lives/points and returns token to off-screen
+// position.
 SpecialToken.prototype.update = function() {
     var xCollisionDetection = Math.abs(this.x - player.x);
     var yCollisionDetection = Math.abs(this.y - player.y);
@@ -199,15 +210,14 @@ SpecialToken.prototype.update = function() {
         player.lives += this.lifeValue;
         player.points += this.pointValue;
     }
-}
+};
 
+// Draws the player on the screen
 SpecialToken.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+};
 
+// Instantiate enemy objects and place in allEnemies array
 var enemy1 = new Enemy();
 enemy1.giveProperties();
 var enemy2 = new Enemy();
@@ -219,20 +229,17 @@ enemy4.giveProperties();
 var enemy5 = new Enemy();
 enemy5.giveProperties();
 
-
-
 var allEnemies = [];
 
 allEnemies.push(enemy1, enemy2, enemy3, enemy4, enemy5);
 
+// Instantiate player and token objects
 var player = new Player();
 
 var token = new SpecialToken();
 
-
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// Listens for key presses and sends the keys to the
+// Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
         37: 'left',
@@ -240,13 +247,20 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
+    // Only allows key presses to be processed when
+    // player lives are greater than 0.  Gives game
+    // freeze effect upon game end.
     if (player.lives > 0) {
         player.handleInput(allowedKeys[e.keyCode]);
     }
 });
 
-document.addEventListener('keydown', function(n) {
-    if ((player.lives === 0) && (n.keyCode === 78)) {
+// Listens for 'n' key press to start new game after player
+// lives have been depleted.
+document.addEventListener('keydown', function(e) {
+    // Resets player lives and points when 'n' is pressed
+    // at game end
+    if ((player.lives === 0) && (e.keyCode === 78)) {
         player.lives = 5;
         player.points = 0;
     }

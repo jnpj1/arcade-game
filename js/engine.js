@@ -2,13 +2,6 @@
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
  * render methods on your player and enemy objects (defined in your app.js).
- *
- * A game engine works by drawing the entire game screen over and over, kind of
- * like a flipbook you may have created as a kid. When your player moves across
- * the screen, it may look like just that image/character is moving or being
- * drawn but that is not the case. What's really happening is the entire "scene"
- * is being drawn over and over, presenting the illusion of animation.
- *
  * This engine is available globally via the Engine variable and it also makes
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
@@ -29,15 +22,11 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
-    /* This function serves as the kickoff point for the game loop itself
+    /* Serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
     function main() {
-        /* Get our time delta information which is required if your game
-         * requires smooth animation. Because everyone's computer processes
-         * instructions at different speeds we need a constant value that
-         * would be the same for everyone (regardless of how fast their
-         * computer is) - hurray time!
+        /* Get our time delta information required for smooth animation.
          */
         var now = Date.now(),
             dt = (now - lastTime) / 1000.0;
@@ -68,26 +57,17 @@ var Engine = (function(global) {
         main();
     }
 
-    /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. Based on how
-     * you implement your collision detection (when two entities occupy the
-     * same space, for instance when your character should die), you may find
-     * the need to add an additional function call here. For now, we've left
-     * it commented out - you may or may not want to implement this
-     * functionality this way (you could just implement collision detection
-     * on the entities themselves within your app.js file).
+    /* Called by main (our game loop) and itself calls all
+     * of the functions which may need to update entity's data.
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
     }
 
-    /* This is called by the update function and loops through all of the
+    /* Called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
-     * player object. These update methods should focus purely on updating
-     * the data/properties related to the object. Do your drawing in your
-     * render methods.
+     * their update() methods. It will then call the update function for the
+     * player and token objects.
      */
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
@@ -97,11 +77,9 @@ var Engine = (function(global) {
         token.update();
     }
 
-    /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
-     * game tick (or loop of the game engine) because that's how games work -
-     * they are flipbooks creating the illusion of animation but in reality
-     * they are just drawing the entire screen over and over.
+    /* Initially draws the "game level", it will then call
+     * the renderEntities, renderPoints, renderLives, and renderGameOver
+     * functions.
      */
     function render() {
         /* This array holds the relative URL to the image used
@@ -136,14 +114,14 @@ var Engine = (function(global) {
             }
         }
         renderEntities();
-        addPoints();
-        addLives();
-        reset();
+        renderPoints();
+        renderLives();
+        renderGameOver();
     }
 
-    /* This function is called by the render function and is called on each game
+    /* Called by the render function and is called on each game
      * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
+     * on your enemy, player, and token entities within app.js.
      */
     function renderEntities() {
         /* Loop through all of the objects within the allEnemies array and call
@@ -157,45 +135,48 @@ var Engine = (function(global) {
        token.render();
     }
 
-    function addPoints() {
-        ctx.clearRect(250, 0, 260, 50);
-        ctx.fillStyle = "black";
-        ctx.font = "22px Arial";
-        ctx.fillText(("Score: " + player.points), 380, 45);
-    }
-
-    function addLives() {
-        ctx.clearRect(0, 0, 250, 50);
-        ctx.fillStyle = "black";
-        ctx.font = "22px Arial";
-        ctx.fillText(("Lives: " + player.lives), 25, 45);
-    }
-
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
+    /* Called by the render function.  Renders current points counter.
      */
-    function reset() {
+    function renderPoints() {
+        ctx.clearRect(250, 0, 260, 50);
+        ctx.fillStyle = 'black';
+        ctx.font = '22px Arial';
+        ctx.fillText(('Score: ' + player.points), 380, 45);
+    }
+
+    /* Called by the render function.  Renders current lives counter.
+     */
+    function renderLives() {
+        ctx.clearRect(0, 0, 250, 50);
+        ctx.fillStyle = 'black';
+        ctx.font = '22px Arial';
+        ctx.fillText(('Lives: ' + player.lives), 25, 45);
+    }
+
+    /* Called by the render function.  Checks to see if there are no
+     * player lives left.  If so, game over screen renders.
+     */
+    function renderGameOver() {
         if (player.lives === 0) {
             var grd = ctx.createLinearGradient(0, 0, 500, 606);
-            grd.addColorStop(0, "#b3b3ff");
-            grd.addColorStop(1, "#b3e6cc");
+            grd.addColorStop(0, '#b3b3ff');
+            grd.addColorStop(1, '#b3e6cc');
             ctx.fillStyle = grd;
             ctx.globalAlpha = 0.8;
             ctx.fillRect(0, 0, 505, 606);
             ctx.globalAlpha = 1;
-            ctx.fillStyle = "navy";
-            ctx.font = "30px Arial";
-            ctx.fillText("GAME OVER", 160, 250);
-            ctx.font = "24px Arial";
-            ctx.fillText(("Final Score: " + player.points), 165, 300);
-            ctx.fillText(("'n' for new game"), 165, 350);
+            ctx.fillStyle = 'navy';
+            ctx.font = '30px Arial';
+            ctx.fillText('GAME OVER', 160, 250);
+            ctx.font = '24px Arial';
+            ctx.fillText(('Final Score: ' + player.points), 165, 300);
+            ctx.fillText(('"n" for new game'), 165, 350);
         }
     }
 
-    /* Go ahead and load all of the images we know we're going to need to
-     * draw our game level. Then set init as the callback method, so that when
-     * all of these images are properly loaded our game will start.
+    /* Load all of the images needed to draw game level.
+     * Set init as the callback method, so that when
+     * the images are properly loaded the game will start.
      */
     Resources.load([
         'images/stone-block.png',
@@ -213,9 +194,7 @@ var Engine = (function(global) {
     ]);
     Resources.onReady(init);
 
-    /* Assign the canvas' context object to the global variable (the window
-     * object when run in a browser) so that developers can use it more easily
-     * from within their app.js files.
+    /* Assign the canvas' context object to the global variable
      */
     global.ctx = ctx;
 })(this);

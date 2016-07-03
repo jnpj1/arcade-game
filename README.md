@@ -1,28 +1,36 @@
-Girls Vs. Bugs
-===============================
+# Girls Vs. Bugs: Frogger-Style Arcade Game
 
 Help the team of girls to collect points while avoiding the monster bugs!
 
-Use the up, down, left, and right keys to move the current team member one position.  
+## Run
 
-Steer clear of the bugs!  If you collide with a bug, you will lose a life.  The next team member will start on the grass if you still have lives left.
+Open index.html with Google Chrome.
 
-Make your way across the street to the water to earn points and cause a special token to appear.
+## Game Play
 
-Collect gem tokens for extra points and heart tokens for extra lives.  Crossing to the water again generate cause another token.
+* Use the up, down, left, and right keys to move the current team member one position.
 
-Score as many points as you can before running out of lives.
+* Make your way across the street to the water to earn points and cause a special token to appear.
 
-Press the 'n' key to start a new game after losing all of your lives.
+* Steer clear of the bugs!  If you collide with a bug, you will lose a life and any tokens will disappear.  The next team member will start on the grass if you still have lives left.
+
+* Collect gem tokens for extra points and heart tokens for extra lives.  Crossing to the water will generate another token.
+
+* Score as many points as you can before running out of lives.
+
+* Press the 'n' key to start a new game after losing all of your lives.
 
 
+### Score Points:
 
-Points:
+* Reach the water: 10 points
 
-Reach the water: 10 points
+* Collect common yellow gem: 20 points
 
-Collect yellow gem: 20 points
+* Collect unusual green gem: 30 points
 
-Collect green gem: 30 points
- 
-Collect blue gem: 40 points
+* Collect rare blue gem: 40 points
+
+### Extra Lives:
+
+Each heart token is worth one extra life!
